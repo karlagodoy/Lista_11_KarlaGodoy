@@ -1,0 +1,605 @@
+## Questão 5
+
+## Baixando os pacotes necessários para a análise 
+
+install.packages("aod")
+
+library(aod)
+
+library(ggplot2)
+
+## Salvando o banco de dados
+
+mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+
+## Visualizando as primeiras linhas dos dados
+
+head(mydata)
+
+# admit gre  gpa rank
+# 1     0 380 3.61    3
+# 2     1 660 3.67    3
+# 3     1 800 4.00    1
+# 4     1 640 3.19    4
+# 5     0 520 2.93    4
+# 6     1 760 3.00    2
+
+## Obtendo descrições básicas para o conjunto de dados.
+
+summary(mydata)
+
+# admit             gre             gpa             rank      
+# Min.   :0.0000   Min.   :220.0   Min.   :2.260   Min.   :1.000  
+# 1st Qu.:0.0000   1st Qu.:520.0   1st Qu.:3.130   1st Qu.:2.000  
+# Median :0.0000   Median :580.0   Median :3.395   Median :2.000  
+# Mean   :0.3175   Mean   :587.7   Mean   :3.390   Mean   :2.485  
+# 3rd Qu.:1.0000   3rd Qu.:660.0   3rd Qu.:3.670   3rd Qu.:3.000  
+# Max.   :1.0000   Max.   :800.0   Max.   :4.000   Max.   :4.000  
+
+## Obtendo desvios padrões
+
+sapply(mydata, sd)
+
+# admit         gre         gpa        rank 
+# 0.4660867 115.5165364   0.3805668   0.9444602 
+
+## Garantindo que não haja células com 0
+
+xtabs(~admit + rank, data = mydata)
+
+#  rank
+# admit  1  2  3  4
+# 0 28 97 93 55
+# 1 33 54 28 12
+
+
+# Convertendo a classificação da base em um fator para indicar que a classificação deve ser 
+# tratada como uma variável categórica
+
+mydata$rank <- factor(mydata$rank)
+
+# Modelo de regressão logística usando o glm
+
+mylogit <- glm(admit ~ gre + gpa + rank, data = mydata, family = "binomial")
+
+summary(mylogit)
+
+# Call:
+#  glm(formula = admit ~ gre + gpa + rank, family = "binomial", 
+#      data = mydata)
+
+# Deviance Residuals: 
+#  Min       1Q   Median       3Q      Max  
+# -1.6268  -0.8662  -0.6388   1.1490   2.0790  
+
+# Coefficients:
+#  Estimate Std. Error z value Pr(>|z|)    
+# (Intercept) -3.989979   1.139951  -3.500 0.000465 ***
+#  gre          0.002264   0.001094   2.070 0.038465 *  
+#  gpa          0.804038   0.331819   2.423 0.015388 *  
+#  rank2       -0.675443   0.316490  -2.134 0.032829 *  
+#  rank3       -1.340204   0.345306  -3.881 0.000104 ***
+#  rank4       -1.551464   0.417832  -3.713 0.000205 ***
+  ---
+#  Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# (Dispersion parameter for binomial family taken to be 1)
+
+# Null deviance: 499.98  on 399  degrees of freedom
+# Residual deviance: 458.52  on 394  degrees of freedom
+# AIC: 470.52
+
+# Number of Fisher Scoring iterations: 4
+
+# Podemos observar que tanto gre quanto gpa são estatisticamente significativos, assim como os três termos para rank.
+# Os coeficientes de regressão logística dão a mudança nas probabilidades de log do resultado para um aumento de uma unidade na variável preditora.
+# Para cada mudança de uma unidade em gre, as probabilidades de entrada (versus não admissão) aumentam em 0.002.
+# Para um aumento de uma unidade em gpa, as chances de ser admitido na pós-graduação aumentaram em 0,804.
+# As variáveis indicadoras de classificação têm uma interpretação ligeiramente diferente. Por exemplo, ter frequentado uma instituição de graduação 
+# com grau 2, em comparação a uma instituição com classificação 1, altera as chances de registro de admissão em -0.675.
+
+## Obtendo intervlos de confiança dos coeficientes estimados 
+
+## Usando a probabilidade em Log
+
+confint(mylogit)
+
+#                 2.5 %   97.5 %
+# (Intercept) -6.271620 -1.79255
+# gre          0.000138  0.00444
+# gpa          0.160296  1.46414
+# rank2       -1.300889 -0.05675
+# rank3       -2.027671 -0.67037
+# rank4       -2.400027 -0.75354
+
+## Usando erros padrão
+
+confint.default(mylogit)
+
+#                2.5 %   97.5 %
+# (Intercept) -6.22424 -1.75572
+# gre          0.00012  0.00441
+# gpa          0.15368  1.45439
+# rank2       -1.29575 -0.05513
+# rank3       -2.01699 -0.66342
+# rank4       -2.37040 -0.73253
+
+## Testando um efeito geral para Rank
+
+wald.test(b = coef(mylogit), Sigma = vcov(mylogit), Terms = 4:6)
+
+# ----------
+# 
+# Chi-squared test:
+# X2 = 20.9, df = 3, P(> X2) = 0.00011
+
+# A estatística do teste qui-quadrado de 20,9, com três graus de 
+# liberdade está associada a um valor de p de 0,00011, indicando que o 
+# efeito geral da classificação é estatisticamente significativo.
+
+# Testando hipóteses adicionais sobre as diferenças nos coeficientes para os diferentes níveis de classificação. 
+
+# Teste para identificar se o coeficiente para rank = 2 é igual ao coeficiente para rank = 3.
+
+l <- cbind(0, 0, 0, 1, -1, 0)
+wald.test(b = coef(mylogit), Sigma = vcov(mylogit), L = l)
+
+# Wald test:
+# ----------
+# 
+# Chi-squared test:
+# X2 = 5.5, df = 1, P(> X2) = 0.019
+
+# A estatística do teste qui-quadrado de 5,5 com 1 grau de liberdade está associada com um p- valor de 0,019, indicando 
+# que a diferença entre o coeficiente de classificação = 2 e o coeficiente de classificação = 3 é estatisticamente significativa.
+
+# Exponenciando os coeficientes para interpretá-los como odds-ratios
+
+## Apenas odds ratios
+
+exp(coef(mylogit))
+
+# (Intercept)         gre         gpa       rank2       rank3       rank4 
+# 0.0185001   1.0022670   2.2345448   0.5089310   0.2617923   0.2119375 
+
+# odds ratios e 95% CI
+
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+
+#                 OR   2.5 % 97.5 %
+# (Intercept) 0.0185 0.00189  0.167
+# gre         1.0023 1.00014  1.004
+# gpa         2.2345 1.17386  4.324
+# rank2       0.5089 0.27229  0.945
+# rank3       0.2618 0.13164  0.512
+# rank4       0.2119 0.09072  0.471
+
+## Agora podemos dizer que, para um aumento de uma unidade em gpa, as chances de
+## ser admitido na pós-graduação (versus não ser admitido) aumentam em um fator de 2,23.
+
+## Calculando a probabilidade prevista de admissão em cada valor de classificação, mantendo gre e gpa em suas médias. 
+
+## Primeiro criamos e visualizamos o quadro de dados.
+
+newdata1 <- with(mydata, data.frame(gre = mean(gre), gpa = mean(gpa), rank = factor(1:4)))
+
+## Observando data frame
+
+newdata1
+
+#   gre  gpa rank
+# 1 588 3.39    1
+# 2 588 3.39    2
+# 3 588 3.39    3
+# 4 588 3.39    4
+
+## Criando probbilidades
+
+newdata1$rankP <- predict(mylogit, newdata = newdata1, type = "response")
+
+newdata1
+
+#   gre  gpa rank rankP
+# 1 588 3.39    1 0.517
+# 2 588 3.39    2 0.352
+# 3 588 3.39    3 0.219
+# 4 588 3.39    4 0.185
+
+# A saída acima, vemos que a probabilidade prevista de ser aceito em um programa de pós-graduação é de 0,52 para estudantes das 
+# instituições de graduação de maior prestígio (classificação = 1) e de 0,18 para alunos das instituições de menor classificação (classificação = 4). e gpa em seus meios.
+
+## crie uma tabela de probabilidades previstas variando o valor de gre e rank. 
+
+## Criando 100 valores de gre entre 200 e 800, em cada valor de rank (ou seja, 1, 2, 3 e 4).
+
+newdata2 <- with(mydata, data.frame(gre = rep(seq(from = 200, to = 800, length.out = 100),
+                                              4), gpa = mean(gpa), rank = factor(rep(1:4, each = 100))))
+
+newdata3 <- cbind(newdata2, predict(mylogit, newdata = newdata2, type = "link",
+                                    se = TRUE))
+newdata3 <- within(newdata3, {
+  PredictedProb <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+
+## Visualiando algumas linhas do banco final
+
+head(newdata3)
+
+#   gre  gpa rank    fit se.fit residual.scale    UL    LL PredictedProb
+# 1 200 3.39    1 -0.811  0.515              1 0.549 0.139         0.308
+# 2 206 3.39    1 -0.798  0.509              1 0.550 0.142         0.311
+# 3 212 3.39    1 -0.784  0.503              1 0.551 0.145         0.313
+# 4 218 3.39    1 -0.770  0.498              1 0.551 0.149         0.316
+# 5 224 3.39    1 -0.757  0.492              1 0.552 0.152         0.319
+# 6 230 3.39    1 -0.743  0.487              1 0.553 0.155         0.322
+
+## Plotando as probabilidades previstas e intervalos de confiança de 95%
+
+ggplot(newdata3, aes(x = gre, y = PredictedProb)) + geom_ribbon(aes(ymin = LL,
+                                                                    ymax = UL, fill = rank), alpha = 0.2) + geom_line(aes(colour = rank),
+                                                                                                                      size = 1)
+## Descobrindo quanto o modelo é adequado 
+
+## Encontrar a diferença no desvio para os dois modelos
+
+with(mylogit, null.deviance - deviance)
+
+# [1] 41.45903
+
+# Os graus de liberdade para a diferença entre os dois modelos é igual ao número de variáveis preditoras no modo:
+
+with(mylogit, df.null - df.residual)
+
+# [1] 5
+
+# P- Valor
+
+with(mylogit, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
+# [1] 7.58e-08
+
+## O qui-quadrado de 41,46 com 5 graus de liberdade e um p-valor associado menor que 0,001 nos 
+## diz que nosso modelo como um todo se ajusta significativamente melhor que um modelo vazio. Isso às vezes é chamado de teste de razão de verossimilhança (o desvio de deviance é -2 * log verossimilhança).
+
+## Vendo a probabilidade do log do modelo
+
+logLik(mylogit)
+
+## 'log Lik.' -229 (df=6)
+
+----
+  
+## QuestÃ£o 6: 
+  
+  # Instalar e requerer pacotes necessÃ¡rios:
+  install.packages("aod")
+require(aod)
+require(ggplot2)
+
+# Carregar base de dados:
+dados <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+
+# Converter variÃ¡vel categÃ³rica "rank" para fator:
+dados$rank <- factor(dados$rank)
+
+# Checar primeiras linhas da base:
+head(dados)
+
+# Checar estatÃ­sticas descritivas da base:
+summary(dados)
+
+# Checar variÃ¡vel rank vs admit (a VD da questÃ£o): 
+xtabs(~rank + admit, data = dados)
+
+# Gerar regressÃ£o probit (visto que a variÃ¡vel de resposta Ã© binÃ¡ria), VD = admit,
+# VIs = gre, gpa e rank:
+regprobit <- glm(admit ~ gre + gpa + rank, family = binomial(link = "probit"), 
+                 data = dados)
+
+# Sumarizar modelo:
+summary(regprobit)
+
+# Gerar intervalo de confianÃ§a para os coeficientes encontrados:
+confint(regprobit)
+
+# Testar o efeito da VI "rank":
+wald.test(b = coef(regprobit), Sigma = vcov(regprobit), Terms = 4:6)
+# Nota-se que o efeito de rank Ã© estatisticamente significante.
+
+# Testar a diferenÃ§a entre os termos 4 e 5 do modelo de regressÃ£o (rank = 2 e 
+# rank = 3):
+l <- cbind(0, 0, 0, 1, -1, 0)
+wald.test(b = coef(regprobit), Sigma = vcov(regprobit), L = l)
+# Nota-se que a diferenÃ§a entre os coeficientes de rank = 2 e rank = 3 Ã© 
+# estatisticamente significante.
+
+# Criar nova base com probabilidades esperadas das VIs (para criar um "null model"): 
+novosdados <- data.frame(gre = rep(seq(from = 200, to = 800, length.out = 100), 
+                                   4 * 4), gpa = rep(c(2.5, 3, 3.5, 4), each = 100 * 4), 
+                         rank = factor(rep(rep(1:4, each = 100), 4)))
+
+# Checar primeiras linhas da nova base:
+head(novosdados)
+
+# Criar quatro plots com as probabilidades esperadas para os diferentes escores
+# da VI "gre", um para cada nÃ­vel da VI "gpa" e cada cor de linha representa
+# uma categoria de "rank" e IC 95%: 
+
+# Acrescentar valores do erro padrÃ£o dos coeficientes e probabilidade predita
+# Ã  base:
+novosdados[, c("p", "se")] <- predict(regprobit, novosdados, type = "response", 
+                                      se.fit = TRUE)[-3]
+
+# Plotar grÃ¡ficos:
+ggplot(novosdados, aes(x = gre, y = p, colour = rank)) + geom_line() + facet_wrap(~gpa)
+
+# Testar a diferenÃ§a entre a variÃ¢ncia dos resÃ­duos do modelo nulo e o construÃ­do: 
+with(regprobit, null.deviance - deviance)
+
+# Analisar a diferenÃ§a nos graus de liberdade entre o modelo nulo e o construÃ­do:
+with(regprobit, df.null - df.residual)
+
+# Obter p-valor a partir do teste do qui-quadrado:
+with(regprobit, pchisq(null.deviance - deviance, df.null - df.residual, 
+                       lower.tail = FALSE))
+
+
+---
+  
+  
+## QuestÃ£o 7
+  
+# Adicionar valores dos ICs 95% Ã  base:
+  novosdados <- within(novosdados, {
+    PredictedProb <- novosdados$p
+    lwr <- PredictedProb - (1.96 * se)
+    upr <- PredictedProb + (1.96 * se)
+  })
+
+# Checar base:
+head(novosdados)
+
+# Plotar grÃ¡ficos com intervalos de confianÃ§a:
+ggplot(novosdados, aes(x = gre, y = PredictedProb)) + 
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = rank), alpha = 0.2) +
+  geom_line(aes(colour = rank), size = 0.7) + facet_wrap(~gpa) 
+
+
+---
+
+## QuestÃ£o 8
+  
+  # Abrindo pacotes
+  if(require(ggplot2) == F) install.packages('ggplot2'); require(ggplot2)
+
+# Abrindo banco de dados
+sample <- read.csv("C:/Users/NATHALIA/Documents/CP-Mestrado/AnÃ¡lise de Dados - Davi Moreira/sample.csv", header=T)
+
+
+## a)
+# RegressÃ£o logit com VD hon e VI female
+reg <- glm(hon ~ female, family = binomial, data = sample)
+
+# Resumo da regressÃ£o
+summary(reg)
+
+# Logit inverso para transformar os coeficientes do modelo em probabilidade
+exp( coef(reg) ) /  ( 1 + exp( coef(reg) ) )
+
+
+## b)
+# RegressÃ£o logit com VD hon e VI math
+reg2 <- glm(hon ~ math, family = binomial, data = sample)
+
+# Resumo da regressÃ£o
+summary(reg2)
+
+# Logit inverso para transformar os coeficientes do modelo em probabilidade
+exp( coef(reg2) ) /  ( 1 + exp( coef(reg2) ) )
+
+## c)
+# RegressÃ£o logit com VD hon e VI math
+reg3 <- glm(hon ~ female + math + read, family = binomial, data = sample)
+
+# Resumo da regressÃ£o
+summary(reg3)
+
+## GrÃ¡fico do comportamento do modelo para âfemaleâ em relaÃ§Ã£o a âmathâ, com mÃ©dia de read.
+
+# Probabilidade predita para da admissÃ£o de cada valor de female e math, deixando read na sua mÃ©dia.
+sample.2 <- with(sample, data.frame(female, math, read = mean(read)))
+
+# TransformaÃ§Ã£o dos valores previstos e os limites de confianÃ§a em probabilidades.
+sample.2 <- cbind(sample.2, predict(reg3, newdata = sample.2, type = "link", se = TRUE))
+sample.2 <- within(sample.2, {
+  PredictedProb <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+
+# Colocando female como fator
+sample.2$female <- factor(sample.2$female)
+
+# O grÃ¡fico do comportamento do modelo para âfemaleâ em relaÃ§Ã£o a âmathâ, com mÃ©dia de read.
+ggplot(sample.2, aes(x = math, y = PredictedProb)) + 
+  geom_ribbon(aes(ymin = LL, ymax = UL, fill = female), alpha = 0.2) + 
+  geom_line(aes(colour = female))
+
+## d)
+
+# Abrindo pacote 
+if(require(rms) == F) install.packages('rms'); require(rms)
+
+# Pseudo-R2 de Nagelkerke
+reg3n <- lrm(hon ~ female + math + read, data = sample)
+
+# Resumo da regressÃ£o incluindo o R2 de Nagelkerke
+print(reg3n)
+
+## R2 = 0.421 
+
+
+# Questão 9
+  
+# Instalar e requerer pacotes necessÃ¡rios:
+
+install.packages("foreign")  
+install.packages("nnet")
+install.packages("ggplot2")
+install.packages("reshape2")
+install.packages("effects")
+install.packages("tidyverse")
+  
+require(foreign)
+require(nnet)
+require(ggplot2)
+require(reshape2)
+require(effects)
+require(tidyverse)
+
+
+# Carregar dados:
+ml <- read.dta("https://stats.idre.ucla.edu/stat/data/hsbdemo.dta")
+
+# Analisar variÃ¡veis de interesse:
+with(ml, table(ses, prog))
+
+#prog
+# ses      general academic vocation
+# low         16       19       12
+# middle      20       44       31
+# high         9       42        7
+
+# Obter estatÃ­sticas descritivas das variÃ¡veis:
+with(ml, do.call(rbind, 
+                 tapply(write, prog, function(x) c(M = mean(x), SD = sd(x)))))
+
+#                 M       SD
+# general  51.33333 9.397775
+# academic 56.25714 7.943343
+# vocation 46.76000 9.318754
+
+# Definir categoria de referÃªncia ("academic"):
+ml$prog2 <- relevel(ml$prog, ref = "academic")
+
+# Gerar regressÃ£o logÃ­stica multinomial:
+test <- multinom(prog2 ~ ses + write, data = ml)
+
+# weights:  15 (8 variable)
+# initial  value 219.722458 
+# iter  10 value 179.982880
+# final  value 179.981726 
+# converged
+
+# Checar resultados da regressÃ£o:
+summary(test)
+
+# Call:
+#  multinom(formula = prog2 ~ ses + write, data = ml)
+
+# Coefficients:
+#  (Intercept)  sesmiddle    seshigh      write
+# general     2.852198 -0.5332810 -1.1628226 -0.0579287
+# vocation    5.218260  0.2913859 -0.9826649 -0.1136037
+
+# Std. Errors:
+#  (Intercept) sesmiddle   seshigh      write
+# general     1.166441 0.4437323 0.5142196 0.02141097
+# vocation    1.163552 0.4763739 0.5955665 0.02221996
+
+# Residual Deviance: 359.9635 
+# AIC: 375.9635
+
+# Calcular p-valor:
+z <- summary(test)$coefficients/summary(test)$standard.errors
+p <- (1 - pnorm(abs(z), 0, 1)) * 2
+p
+
+# (Intercept) sesmiddle    seshigh        write
+# general  0.0144766100 0.2294379 0.02373856 6.818902e-03
+# vocation 0.0000072993 0.5407530 0.09894976 3.176045e-07
+
+# Extrair coeficientes do modelo e exponenciar valores, que aponta o "risk ratio"
+# relativo para o aumento de uma unidade na VI:
+exp(coef(test))
+
+#  (Intercept) sesmiddle   seshigh     write
+# general     17.32582 0.5866769 0.3126026 0.9437172
+# vocation   184.61262 1.3382809 0.3743123 0.8926116
+
+# Calcular probabilidade predita para cada resultado e checar primeiras linhas:
+
+head(pp <- fitted(test))
+
+# academic   general  vocation
+# 1 0.1482764 0.3382454 0.5134781
+# 2 0.1202017 0.1806283 0.6991700
+# 3 0.4186747 0.2368082 0.3445171
+# 4 0.1726885 0.3508384 0.4764731
+# 5 0.1001231 0.1689374 0.7309395
+# 6 0.3533566 0.2377976 0.4088458
+
+# Analisar mudanÃ§as nas probabilidades preditas. Neste caso, a VI "write" serÃ¡
+# mantida constante (em sua mÃ©dia), enquanto serÃ£o analisadas as probabilidades
+# preditas para cada um dos nÃ­veis da VI "ses":
+dses <- data.frame(ses = c("low", "middle", "high"), write = mean(ml$write))
+predict(test, newdata = dses, "probs")
+
+#  academic   general  vocation
+# 1 0.4396845 0.3581917 0.2021238
+# 2 0.4777488 0.2283353 0.2939159
+# 3 0.7009007 0.1784939 0.1206054
+
+# Analisar as probabilidades preditas mÃ©dias para os diferentes valores de "write",
+# em cada um dos nÃ­veis da variÃ¡vel "ses":
+dwrite <- data.frame(ses = rep(c("low", "middle", "high"), each = 41), 
+                     write = rep(c(30:70), 3))
+
+# Criar objeto com probabilidades preditas para cada um dos valores de "ses" e "write":
+pp.write <- cbind(dwrite, predict(test, newdata = dwrite, type = "probs", se = TRUE))
+
+# Calcular as probabilidades preditas mÃ©dias para cada nÃ­vel de "ses":
+by(pp.write[, 3:5], pp.write$ses, colMeans)
+
+# pp.write$ses: high
+# academic   general  vocation 
+# 0.6164315 0.1808037 0.2027648 
+----------------------------------------------------------------- 
+#  pp.write$ses: low
+# academic   general  vocation 
+# 0.3972977 0.3278174 0.2748849 
+----------------------------------------------------------------- 
+#  pp.write$ses: middle
+# academic   general  vocation 
+# 0.4256198 0.2010864 0.3732938
+
+# Utilizar funÃ§Ã£o "melt" do pacote "reshape2" para transformar o objeto "pp.write",
+# criado acima, em formato "long":
+lpp <- melt(pp.write, id.vars = c("ses", "write"), value.name = "probability")
+
+# Checar primeiras linhas:
+head(lpp) 
+
+# Plotar probabilidades preditas para os valores de "write" a cada nÃ­vel de "ses",
+# em cada um dos 3 tipos de programa ("academic", "general" ou "vocation") 
+ggplot(lpp, aes(x = write, y = probability, colour = ses)) + geom_line() + 
+  facet_grid(variable ~ ., scales = "free")
+
+
+---
+  
+## Questão 10
+
+set.seed (dses)
+df <- data.frame(x =1:10,
+                 F =runif(10,1,2),
+                 L =runif(10,0,1),
+                 U =runif(10,2,3))
+
+require(ggplot2)
+ggplot(df, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymax = U, ymin = L))
