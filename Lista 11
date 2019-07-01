@@ -1,3 +1,65 @@
+# Lista 11
+# Karla Godoy
+
+## Questão 1
+
+# a)
+
+# É um tipo de modelo de regressão binomial. Neste tipo de modelo a variável dependente assume valores
+# de 0 ou 1, a depender da(s) variável(is) dependente(s), responsável(is) por predizer o modelo. A relação
+# entre a VD e a(s) VI(s) é simples e permite que o modelo seja ajustado por regressão linear.
+
+# b) 
+# Os valores estimados (beta) podem ser interpretados como a mudança na probabilidade da variável dependente ser igual a 1.
+
+# c)
+# Os coeficientes estimados são interpretados de forma que o aumento de 1% na(s) variável(is) indepente(s) 
+# causa um efeito de Beta% na probabilidade da variável dependente ser igual a 1.
+
+# d)
+# O principal problema do LPM é que ele assume que a função de probabilidade condicional é linear. Além de 
+# trazer 3 problemas: a não normalidade do termo de erro, erros heterocedásticos e previsões potencialmente sem sentido.
+
+
+## Questão 2
+
+# a)
+# É um modelo de regressão onde a variável dependente é binária e o erro do modelo possui distribuição logística, ele é 
+# o logaritmo do odds p: [p/(1-p)]. Este modelo cria valores de probabilidade 0 a 1 para de –infinito a +infinito.
+
+# b)
+# Os coeficientes estimados apresentam a direção do seu efeito (se positivo ou negativo) de acordo com o seu sinal e o 
+# aumento de uma unidade da variável independente causa um aumento na log-odds na variável dependente de B (valor do beta).
+
+# c) 
+# Os coeficientes estimados podem ser interpretados da mesma forma que no modelo bivariado, fixados os valores medianos das 
+# outras variáveis independentes, seus valores são responsáveis por dar a mudança no log-odds do resultado para um aumento de
+# uma unidade na variável preditora.
+
+## Questão 3
+
+# a)
+# É um modelo de regressão onde a variável dependente é binária e o erro do modelo possui distribuição normal e a variância do 
+# erro é igual a 1. O modelo probit estima a probabilidade de um valor cair em um dos dois possíveis resultados binários.
+
+# b)
+# Uma mudança de uma unidade na VI leva a uma mudança B (Beta) no escore z da VD.
+
+# c)
+# Assim como para modelos bivariados, o aumento de 1 unidade em uma VI1 dentro da regressão multivariada causa um aumento de Beta1 no score-z.  
+
+# Questão 4
+# a) A função logit é bem similar, mas tem caudas mais finas do que a distribuição normal.
+
+
+# b) Uma variável latente é uma variável que não é observável diretamente (no mundo real), mas uma variável "escondida" que é importante na definição de um modelo. 
+# Essas variáveis podem ser inferidas de outras variáveis que são observadas.  Elas aparecem no modelo em forma de resposta binária.
+
+# C) Nos modelos Logit eProbit Então, o impacto marginal de mudar uma variável não é constante. Nestes tipos de modelo a interpretação que deve ser feita quando este 
+# se mostra significante é que com um aumento de 1% no Beta apresentado afeta o z-score de (Y = 1) de acordo com o Beta identificado. Se o coeficiente no BVAP é de 0,0923 e
+# significativo, isso significa que um aumento de 1% no BVAP aumentará o z-score de Pr (Y = 1) por 0,0923.
+
+
 ## Questão 5
 
 ## Baixando os pacotes necessários para a análise 
@@ -288,7 +350,7 @@ dados$rank <- factor(dados$rank)
 # Checar primeiras linhas da base:
 head(dados)
 
-# Checar estatÃ­sticas descritivas da base:
+# Checar estatÃ�sticas descritivas da base:
 summary(dados)
 
 # Checar variÃ¡vel rank vs admit (a VD da questÃ£o): 
@@ -325,7 +387,7 @@ novosdados <- data.frame(gre = rep(seq(from = 200, to = 800, length.out = 100),
 head(novosdados)
 
 # Criar quatro plots com as probabilidades esperadas para os diferentes escores
-# da VI "gre", um para cada nÃ­vel da VI "gpa" e cada cor de linha representa
+# da VI "gre", um para cada nÃ�vel da VI "gpa" e cada cor de linha representa
 # uma categoria de "rank" e IC 95%: 
 
 # Acrescentar valores do erro padrÃ£o dos coeficientes e probabilidade predita
@@ -336,10 +398,10 @@ novosdados[, c("p", "se")] <- predict(regprobit, novosdados, type = "response",
 # Plotar grÃ¡ficos:
 ggplot(novosdados, aes(x = gre, y = p, colour = rank)) + geom_line() + facet_wrap(~gpa)
 
-# Testar a diferenÃ§a entre a variÃ¢ncia dos resÃ­duos do modelo nulo e o construÃ­do: 
+# Testar a diferenÃ§a entre a variÃ¢ncia dos resÃ�duos do modelo nulo e o construÃ�do: 
 with(regprobit, null.deviance - deviance)
 
-# Analisar a diferenÃ§a nos graus de liberdade entre o modelo nulo e o construÃ­do:
+# Analisar a diferenÃ§a nos graus de liberdade entre o modelo nulo e o construÃ�do:
 with(regprobit, df.null - df.residual)
 
 # Obter p-valor a partir do teste do qui-quadrado:
@@ -372,7 +434,7 @@ ggplot(novosdados, aes(x = gre, y = PredictedProb)) +
 
 ## QuestÃ£o 8
   
-  # Abrindo pacotes
+# Abrindo pacotes
   if(require(ggplot2) == F) install.packages('ggplot2'); require(ggplot2)
 
 # Abrindo banco de dados
@@ -441,6 +503,7 @@ print(reg3n)
 
 ## R2 = 0.421 
 
+----
 
 # Questão 9
   
@@ -473,7 +536,7 @@ with(ml, table(ses, prog))
 # middle      20       44       31
 # high         9       42        7
 
-# Obter estatÃ­sticas descritivas das variÃ¡veis:
+# Obter estatÃ�sticas descritivas das variÃ¡veis:
 with(ml, do.call(rbind, 
                  tapply(write, prog, function(x) c(M = mean(x), SD = sd(x)))))
 
@@ -485,7 +548,7 @@ with(ml, do.call(rbind,
 # Definir categoria de referÃªncia ("academic"):
 ml$prog2 <- relevel(ml$prog, ref = "academic")
 
-# Gerar regressÃ£o logÃ­stica multinomial:
+# Gerar regressÃ£o logÃ�stica multinomial:
 test <- multinom(prog2 ~ ses + write, data = ml)
 
 # weights:  15 (8 variable)
@@ -544,7 +607,7 @@ head(pp <- fitted(test))
 
 # Analisar mudanÃ§as nas probabilidades preditas. Neste caso, a VI "write" serÃ¡
 # mantida constante (em sua mÃ©dia), enquanto serÃ£o analisadas as probabilidades
-# preditas para cada um dos nÃ­veis da VI "ses":
+# preditas para cada um dos nÃ�veis da VI "ses":
 dses <- data.frame(ses = c("low", "middle", "high"), write = mean(ml$write))
 predict(test, newdata = dses, "probs")
 
@@ -554,14 +617,14 @@ predict(test, newdata = dses, "probs")
 # 3 0.7009007 0.1784939 0.1206054
 
 # Analisar as probabilidades preditas mÃ©dias para os diferentes valores de "write",
-# em cada um dos nÃ­veis da variÃ¡vel "ses":
+# em cada um dos nÃ�veis da variÃ¡vel "ses":
 dwrite <- data.frame(ses = rep(c("low", "middle", "high"), each = 41), 
                      write = rep(c(30:70), 3))
 
 # Criar objeto com probabilidades preditas para cada um dos valores de "ses" e "write":
 pp.write <- cbind(dwrite, predict(test, newdata = dwrite, type = "probs", se = TRUE))
 
-# Calcular as probabilidades preditas mÃ©dias para cada nÃ­vel de "ses":
+# Calcular as probabilidades preditas mÃ©dias para cada nÃ�vel de "ses":
 by(pp.write[, 3:5], pp.write$ses, colMeans)
 
 # pp.write$ses: high
@@ -583,7 +646,7 @@ lpp <- melt(pp.write, id.vars = c("ses", "write"), value.name = "probability")
 # Checar primeiras linhas:
 head(lpp) 
 
-# Plotar probabilidades preditas para os valores de "write" a cada nÃ­vel de "ses",
+# Plotar probabilidades preditas para os valores de "write" a cada nÃ�vel de "ses",
 # em cada um dos 3 tipos de programa ("academic", "general" ou "vocation") 
 ggplot(lpp, aes(x = write, y = probability, colour = ses)) + geom_line() + 
   facet_grid(variable ~ ., scales = "free")
@@ -593,13 +656,324 @@ ggplot(lpp, aes(x = write, y = probability, colour = ses)) + geom_line() +
   
 ## Questão 10
 
-set.seed (dses)
-df <- data.frame(x =1:10,
-                 F =runif(10,1,2),
-                 L =runif(10,0,1),
-                 U =runif(10,2,3))
+ml<- read.dta("https://stats.idre.ucla.edu/stat/data/hsbdemo.dta")
 
-require(ggplot2)
-ggplot(df, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L))
+ml$prog2 <- relevel(ml$prog, ref = "academic")
+
+test <- multinom(prog2 ~ ses + write, data = ml)
+
+summary(test)
+
+confint(test)
+
+fit.eff <- effect("ses", test)
+
+testegrafico <- data.frame(fit.eff$model.matrix, fit.eff$prob, fit.eff$lower.prob, 
+                           fit.eff$upper.prob)
+
+testegrafico$seslow <- ifelse(testegrafico$sesmiddle == 0 & testegrafico$seshigh == 0,  1, 0)
+
+testegrafico$ses <- ifelse(testegrafico$sesmiddle == 1, "middle", ifelse(testegrafico$seshigh == 1,  "high", "low"))
+
+grupo1 <- gather(testegrafico, response, prob, prob.academic:prob.vocation)
+grupo2 <- gather(testegrafico, LB, probLB, L.prob.academic:L.prob.vocation)
+grupo3 <- gather(testegrafico, UB, probUB, U.prob.academic:U.prob.vocation)
+
+# selecionando colunas de cada base
+grafico <- cbind(grupo1[, 12:14], grupo2[, 13:14], grupo3[, 13:14])
+
+# ajustando levels na nova base
+grafico$ses <- factor(grafico$ses, levels = c("low", "middle", "high"))
+
+# gráfico com os intervalos de confiança
+ggplot(grafico, aes(x = response, y = prob)) +
+  geom_errorbar(aes(ymin = probLB, ymax = probUB), width = 0.2, lty=1, lwd=1, col="red") +
+  geom_point(shape=18, size=5, fill="black") +
+  facet_wrap(~ses)
+
+## Questão 11
+
+### letra a)
+  
+# Carregar dados:
+ml <- read.dta("https://stats.idre.ucla.edu/stat/data/hsbdemo.dta")
+
+# Analisar variÃ¡veis de interesse:
+with(ml, table(ses, prog))
+
+# Obter estatÃ�sticas descritivas das variÃ¡veis:
+with(ml, do.call(rbind, tapply(write, prog, function(x) c(M = mean(x),
+                                                          SD = sd(x)))))
+
+# Definir categoria de referÃªncia ("vocation"):
+ml$prog3 <- relevel(ml$prog, ref = "vocation")
+
+# Gerar regressÃ£o logÃ�stica multinomial:
+test2 <- multinom(prog3 ~ ses + write, data = ml)
+
+# Checar resultados da regressÃ£o:
+summary(test2)
+
+# Calcular p-valor:
+z2 <- summary(test2)$coefficients/summary(test2)$standard.errors
+p2 <- (1 - pnorm(abs(z2), 0, 1)) * 2
+p2
+
+# Extrair coeficientes do modelo e exponenciar valores, que aponta o "risk ratio"
+# (ou razÃ£o do risco) relativo para o aumento de uma unidade na VI:
+exp(coef(test2))
+
+# Calcular probabilidade predita para cada resultado e checar primeiras linhas:
+head(pp <- fitted(test2))
+
+# Analisar mudanÃ§as nas probabilidades preditas. Neste caso, a VI "write" serÃ¡
+# mantida constante (em sua mÃ©dia), enquanto serÃ£o analisadas as probabilidades
+# preditas para cada um dos nÃ�veis da VI "ses":
+dses2 <- data.frame(ses = c("low", "middle", "high"), write = mean(ml$write))
+predict(test2, newdata = dses2, "probs")
+
+# Analisar as probabilidades preditas mÃ©dias para os diferentes valores de "write",
+# em cada um dos nÃ�veis da variÃ¡vel "ses":
+dwrite2 <- data.frame(ses = rep(c("low", "middle", "high"), each = 41), 
+                      write = rep(c(30:70), 3))
+
+# Criar objeto com probabilidades preditas para cada um dos valores de "ses" e "write":
+pp.write2 <- cbind(dwrite2, predict(test2, newdata = dwrite2, type = "probs", se = TRUE))
+
+# Calcular as probabilidades preditas mÃ©dias para cada nÃ�vel de "ses":
+by(pp.write2[, 3:5], pp.write2$ses, colMeans)
+
+# Utilizar funÃ§Ã£o "melt" do pacote "reshape2" para transformar o objeto "pp.write",
+# criado acima, em formato "long":
+lpp2 <- melt(pp.write2, id.vars = c("ses", "write"), value.name = "probability")
+
+# Checar primeiras linhas:
+head(lpp2) 
+
+# Plotar probabilidades preditas para os valores de "write" a cada nÃ�vel de "ses",
+# em cada um dos 3 tipos de programa ("academic", "general" ou "vocation") 
+ggplot(lpp2, aes(x = write, y = probability, colour = ses)) + geom_line() + 
+  facet_grid(variable ~ ., scales = "free")
+
+# SÃ£o analisados os efeitos do status socioeconÃ´mico ("ses") e das habilidades 
+# de escrita ("write", medida pelo escore alcanÃ§ado nesta disciplina) de um aluno 
+# sobre a probabilidade deste escolher, no ensino mÃ©dio, programas acadÃªmicos, 
+# gerais ou vocacionais. A categoria de referÃªncia da variÃ¡vel de resposta ("prog"),
+# neste modelo, Ã© "vocation", ou seja, os coeficientes apresentados para as 
+# categorias "general" e "academic" estÃ£o sendo comparados Ã queles encontrados 
+# para a categoria "vocation". 
+
+# Ao observar os efeitos da variÃ¡vel "ses", Ã© possÃ�vel concluir que alunos com
+# status socioeconÃ´mico alto, comparados aos de nÃ�vel socioeconÃ´mico baixo, tÃªm 
+# maior probabilidade de escolher o tipo de programa "acadÃªmico" durante o ensino
+# mÃ©dio, quando comparado ao programa do tipo "vocation" e menor probabilidade 
+# de escolher programas do tipo "general" do que aqueles do tipo "vocation". 
+
+# Os alunos com nÃ�vel socioeconÃ´mico mÃ©dio, comparados aos de nÃ�vel socioeconÃ´mico
+# baixo, tÃªm menor probabilidade de escolher programas dos tipos "general" ou 
+# "academic" quando comparados Ã  categoria base "vocation".
+
+# Neste modelo, o p-valor para todos os coeficientes encontrados foi maior do que
+# 0.05.
+
+# Ao manter constante a variÃ¡vel "write" Ã© possÃ�vel observar as probabilidades
+# preditas para cada nÃ�vel da VI "ses" e tipo de programa (a VD). Para os alunos
+# que optam por programas do tipo "vocation", Ã© mais provÃ¡vel que pertenÃ§am Ã  classe 
+# socioeconÃ´mica mÃ©dia. Para os que optam por "general", a probabilidade de que 
+# pertenÃ§am Ã  classe socioeconÃ´mica baixa Ã© maior. Finalmente, para os que optam
+# por programas do tipo "academic", a probabilidade de que pertenÃ§am Ã  classe 
+# socioeconÃ´mica alta Ã© maior.
+
+### letra b)
+
+# Carregar dados:
+ml <- read.dta("https://stats.idre.ucla.edu/stat/data/hsbdemo.dta")
+
+# Analisar variÃ¡veis de interesse:
+with(ml, table(ses, prog))
+
+# Obter estatÃ�sticas descritivas das variÃ¡veis:
+with(ml, do.call(rbind, tapply(write, prog, function(x) c(M = mean(x),
+                                                          SD = sd(x)))))
+
+# Definir categoria de referÃªncia ("general"):
+ml$prog4 <- relevel(ml$prog, ref = "general")
+
+# Gerar regressÃ£o logÃ�stica multinomial:
+test3 <- multinom(prog4 ~ ses + write, data = ml)
+
+# Checar resultados da regressÃ£o:
+summary(test3)
+
+# Calcular p-valor:
+z3 <- summary(test3)$coefficients/summary(test3)$standard.errors
+p3 <- (1 - pnorm(abs(z3), 0, 1)) * 2
+p3
+
+# Extrair coeficientes do modelo e exponenciar valores, que aponta o "risk ratio"
+# relativo para o aumento de uma unidade na VI:
+exp(coef(test3))
+
+# Calcular probabilidade predita para cada resultado e checar primeiras linhas:
+head(pp <- fitted(test3))
+
+# Analisar mudanÃ§as nas probabilidades preditas. Neste caso, a VI "write" serÃ¡
+# mantida constante (em sua mÃ©dia), enquanto serÃ£o analisadas as probabilidades
+# preditas para cada um dos nÃ�veis da VI "ses":
+dses3 <- data.frame(ses = c("low", "middle", "high"), write = mean(ml$write))
+predict(test3, newdata = dses3, "probs")
+
+# Analisar as probabilidades preditas mÃ©dias para os diferentes valores de "write",
+# em cada um dos nÃ�veis da variÃ¡vel "ses":
+dwrite3 <- data.frame(ses = rep(c("low", "middle", "high"), each = 41), 
+                      write = rep(c(30:70), 3))
+
+# Criar objeto com probabilidades preditas para cada um dos valores de "ses" e "write":
+pp.write3 <- cbind(dwrite3, predict(test3, newdata = dwrite3, type = "probs", se = TRUE))
+
+# Calcular as probabilidades preditas mÃ©dias para cada nÃ�vel de "ses":
+by(pp.write3[, 3:5], pp.write3$ses, colMeans)
+
+# Utilizar funÃ§Ã£o "melt" do pacote "reshape2" para transformar o objeto "pp.write",
+# criado acima, em formato "long":
+lpp3 <- melt(pp.write3, id.vars = c("ses", "write"), value.name = "probability")
+
+# Checar primeiras linhas:
+head(lpp3) 
+
+# Plotar probabilidades preditas para os valores de "write" a cada nÃ�vel de "ses",
+# em cada um dos 3 tipos de programa ("academic", "general" ou "vocation") 
+ggplot(lpp3, aes(x = write, y = probability, colour = ses)) + geom_line() + 
+  facet_grid(variable ~ ., scales = "free")
+
+
+# Ao observar os efeitos da variÃ¡vel "ses", Ã© possÃ�vel concluir que alunos com
+# status socioeconÃ´mico alto, comparados aos de nÃ�vel socioeconÃ´mico baixo,
+# tÃªm maior probabilidade de escolher o tipo de programa "acadÃªmico" durante o 
+# ensino mÃ©dio, quando comparado ao programa do tipo "general" e tambÃ©m maior 
+# probabilidade de escolher programas do tipo "vocation" do que aqueles do tipo 
+# "general". 
+
+# Os alunos com nÃ�vel socioeconÃ´mico mÃ©dio, comparados aos de nÃ�vel socioeconÃ´mico
+# baixo, tÃªm maior probabilidade de escolher programas dos tipos "vocation" ou 
+# "academic" quando comparados Ã  categoria base "general". 
+
+# Com exceÃ§Ã£o do coeficiente do intercepto para "vocation" e de "academic|seshigh"
+# que apresentaram p-valor 0.04 e 0.02 respectivamente, todos os outros resultados
+# apresentaram p valor maior do que 0.05. 
+
+  
+## Questão 12
+
+
+## Questão 13
+
+setwd("C:/Users/karla/Desktop/Mestrado/Análise de Dados/Lista 11")
+## a)
+
+## Carregando Dados
+
+df <- read.dta('nomocc2.dta')
+
+## Criando VariÃ¡vel
+df$wkr <- df$occ
+
+df$wkr <- ifelse(df$wkr %in% c('Menial','BlueCol','Craft'),'Manual',as.character(df$wkr))
+
+df$wkr <- as.factor(df$wkr)
+
+## Alterando Categoria de ReferÃªncia
+df$wbk <- relevel(df$wkr, ref = "Manual")
+
+## White para factor
+df$white <- as.factor(df$white)
+
+## Gerando Modelo
+md <- multinom(wbk ~ white + exper,data = df)
+
+## SumÃ¡rio do Modelo
+summary(md)
+
+## Visualizando Z values
+z_v <- summary(md)$coefficients/summary(md)$standard.errors
+z_v
+
+## Interpretando Efeitos de White:
+# Ser "branco" aumenta a as probabilidades de ser
+# trabalhador profissional e tambÃ©m de ser trabalhador
+# whitecol.
+
+## b)
+
+## Gerando PrevisÃµes - exper fixo
+prv <- effect('white',md,xlevels = list(exper= 0,1), fixed.predictiors = 'exper',
+              given.values = mean(df$exper), se = T) 
+
+to.plot <- data.frame(p.nw = prv$prob[1,],
+                      p.wh = prv$prob[2,],
+                      se.nw = prv$se.prob[1,],
+                      se.wh = prv$se.prob[2,])
+
+par(mfrow = c(1,2))
+plot(to.plot$p.nw,to.plot$se.nw,CI = 2,main = 'No white',vertical = F,
+         varnames = c('Manual','Prof','WhiteCol'), ylim = c(0,.9),
+         cex.var = 1.2, cex.pts = 2, ylab = 'Probabilidades',var.las = 1)
+
+plot(to.plot$p.wh,to.plot$se.wh,CI = 2,main = 'White',vertical = F,
+         varnames = c('Manual','Prof','WhiteCol'), ylim = c(0,.9),
+         cex.var = 1.2, cex.pts = 2, ylab = 'Probabilidades',var.las = 1)
+
+## Gerando PrevisÃµes - white fixo
+# Simulando Dados
+ds <- data.frame(exper = c(seq(2,66,length.out = 100),
+                           seq(2,66,length.out = 100)),
+                 white = c(rep('0',100),rep('1',100)))
+
+# Gerando PrevisÃµes
+ppv <- effect('exper',md,xlevels = list(exper = 2:66),fixed.predictiors = 'white', 
+              given.values = '1', se = T)
+
+
+to.plot <- data.frame(ma.prob = ppv$prob[,1],
+                      pr.prob = ppv$prob[,2],
+                      wh.prob = ppv$prob[,3],
+                      ma.se = ppv$se.prob[,1],
+                      pr.se = ppv$se.prob[,2],
+                      wh.se = ppv$se.prob[,3])
+
+par(mfrow = c(1,3))
+
+plot(to.plot$ma.prob ~ c(2:66), type = 'l',
+     main = 'Manual', ylab = 'Probabilidade',
+     xlab = 'ExperiÃªncia', col = 'red',
+     ylim = c(min(to.plot$ma.prob - 2*to.plot$ma.se),
+              max(to.plot$ma.prob + 2*to.plot$ma.se)))
+
+lines(y = to.plot$ma.prob - 2*to.plot$ma.se,x = c(2:66),
+      col = 'blue')
+lines(y = to.plot$ma.prob + 2*to.plot$ma.se,x = c(2:66),
+      col = 'blue')
+
+plot(to.plot$pr.prob ~ c(2:66), type = 'l',
+     main = 'Profissional', ylab = 'Probabilidade',
+     xlab = 'ExperiÃªncia', col = 'red',
+     ylim = c(min(to.plot$pr.prob - 2*to.plot$pr.se),
+              max(to.plot$pr.prob + 2*to.plot$pr.se)))
+
+lines(y = to.plot$pr.prob - 2*to.plot$pr.se,x = c(2:66),
+      col = 'blue')
+lines(y = to.plot$pr.prob + 2*to.plot$pr.se,x = c(2:66),
+      col = 'blue')
+
+plot(to.plot$wh.prob ~ c(2:66), type = 'l',
+     main = 'White Collar', ylab = 'Probabilidade',
+     xlab = 'ExperiÃªncia', col = 'red',
+     ylim = c(min(to.plot$wh.prob - 2*to.plot$wh.se),
+              max(to.plot$wh.prob + 2*to.plot$wh.se)))
+
+lines(y = to.plot$wh.prob - 2*to.plot$wh.se,x = c(2:66),
+      col = 'blue')
+lines(y = to.plot$wh.prob + 2*to.plot$wh.se,x = c(2:66),
+      col = 'blue')
+
+
